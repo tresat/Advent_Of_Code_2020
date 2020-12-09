@@ -4,9 +4,16 @@ import org.junit.jupiter.api.Test
 
 internal class Day01Test {
     @Test
-    fun solve() {
+    fun solvePart1() {
         val problem = Day01()
-        val solution = problem.solve()
-        println ("Day 1: $solution")
+        val solution = problem.solve(2)
+        println ("Day 1, Part 1: $solution")
+    }
+
+    @Test
+    fun solvePart2() {
+        val problem = Day01()
+        val solution = problem.solve(3)
+        println ("Day 1, Part 2: $solution")
     }
 }
