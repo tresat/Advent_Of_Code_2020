@@ -19,7 +19,7 @@ class Day01 {
     }
 
     private fun readExpensesFromFile(inputFileName: String): List<Int> {
-        val inputFile = File(Day01::class.java.getResource(inputFileName).toURI())
+        val inputFile = File(this::class.java.getResource(inputFileName).toURI())
         return inputFile.readLines().map { it.toInt() }.toList()
     }
 
