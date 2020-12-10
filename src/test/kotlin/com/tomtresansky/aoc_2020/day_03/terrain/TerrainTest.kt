@@ -1,7 +1,5 @@
-package com.tomtresansky.aoc_2020.day_03
+package com.tomtresansky.aoc_2020.day_03.terrain
 
-import com.tomtresansky.aoc_2020.day_03.terrain.TerrainRow
-import com.tomtresansky.aoc_2020.day_03.terrain.TerrainType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

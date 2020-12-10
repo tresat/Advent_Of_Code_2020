@@ -9,5 +9,4 @@ class Day03Test {
         val solution = problem.solve()
         println ("Day 3, Part 1: $solution")
     }
-
 }
