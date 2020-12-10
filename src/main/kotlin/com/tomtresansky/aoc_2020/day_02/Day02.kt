@@ -1,5 +1,6 @@
 package com.tomtresansky.aoc_2020.day_02
 
+import com.tomtresansky.aoc_2020.day_02.policy.PasswordPolicyType
 import java.io.File
 
 @Suppress("SameParameterValue")
@@ -12,9 +13,9 @@ class Day02 {
         const val PASSWORD_IDX = 4
     }
 
-    fun solve(): Int {
+    fun solve(policyType: PasswordPolicyType): Int {
         val inputLines = readPasswordDataFile(INPUT_FILE_NAME)
-        return inputLines.count { hasValidPassword(it) }
+        return inputLines.count { hasValidPassword(it, policyType) }
     }
 
     private fun readPasswordDataFile(inputFileName: String): List<String> {
@@ -22,7 +23,7 @@ class Day02 {
         return inputFile.readLines()
     }
 
-    private fun hasValidPassword(line: String): Boolean {
+    private fun hasValidPassword(line: String, policyType: PasswordPolicyType): Boolean {
         val regex = """(\d+)-(\d+)\s(\w):\s(\w+)""".toRegex()
         val matchResult = regex.matchEntire(line)
 
@@ -32,15 +33,8 @@ class Day02 {
             val keyChar = get(KEY_CHAR_IDX)[0]
 
             val password = get(PASSWORD_IDX)
-            val policy = PasswordPolicy(minOccurs, maxOccurs, keyChar)
+            val policy = policyType.newPolicy(minOccurs, maxOccurs, keyChar)
             return policy.isValid(password)
-        }
-    }
-
-    private class PasswordPolicy(private val minOccurs: Int, private val maxOccurs: Int, private val key: Char) {
-        fun isValid(password: String): Boolean {
-            val keyCount = password.toCharArray().count { it == key }
-            return (keyCount in minOccurs..maxOccurs)
         }
     }
 }
