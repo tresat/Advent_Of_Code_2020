@@ -1,6 +1,5 @@
 package com.tomtresansky.aoc_2020.day_03
 
-import com.tomtresansky.aoc_2020.day_03.traversal.Motion
 import org.junit.jupiter.api.Test
 
 class Day03Test {
