@@ -16,4 +16,5 @@ class Group(val people: List<Person>) {
     }
 
     fun totalUniqueAnswers() = people.map { it.answers }.fold(mutableSetOf<Answer>()) { curr, acc -> curr.addAll(acc); curr }.size
+    fun universallyPresentAnswers() = people.flatMap { it.answers }.groupBy { it }.values.count { it.size == people.size }
 }

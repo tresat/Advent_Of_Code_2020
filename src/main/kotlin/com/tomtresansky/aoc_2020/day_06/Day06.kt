@@ -32,7 +32,5 @@ class Day06 {
 
     fun solvePart1() = groups.map { it.totalUniqueAnswers() }.sum()
 
-    fun solvePart2(): Int {
-        return 2
-    }
+    fun solvePart2() = groups.map { it.universallyPresentAnswers() }.sum()
 }
