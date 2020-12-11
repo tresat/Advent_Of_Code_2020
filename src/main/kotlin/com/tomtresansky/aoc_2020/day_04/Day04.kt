@@ -14,9 +14,7 @@ class Day04 {
 
         private fun readPassportData(inputFileName: String): List<Passport> {
             val inputFile = File(this::class.java.getResource(inputFileName).toURI())
-            val rawLines = inputFile.readLines()
-
-            val lineGroups = splitLineGroups(rawLines)
+            val lineGroups = splitLineGroups(inputFile.readLines())
             return lineGroups.map { Passport.deserialize(it) }
         }
 
