@@ -18,21 +18,7 @@ open class SimplePassportValidator: IPassportValidator {
 class ThoroughPassportValidator: SimplePassportValidator() {
     override fun isValid(passport: Passport): Boolean {
         val missingRequiredField = !super.isValid(passport)
-        val invalidFields = passport.fields.values.filter { !it.isValid() }
-
-        return when {
-            missingRequiredField -> {
-                println("MISSING REQUIRED FIELD: $passport")
-                false
-            }
-            invalidFields.isNotEmpty() -> {
-                println("INVALID FIELD(S) ${invalidFields.map { it.type.desc }.joinToString(", ") }: $passport")
-                false
-            }
-            else -> {
-                println("VALID: $passport")
-                true
-            }
-        }
+        val hasInvalidFields = passport.fields.values.any { !it.isValid() }
+        return !(missingRequiredField || hasInvalidFields)
     }
 }
