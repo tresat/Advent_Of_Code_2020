@@ -3,8 +3,10 @@ package com.tomtresansky.aoc_2020.day_05.bsp
 import com.google.common.math.IntMath.log2
 import java.math.RoundingMode
 
-data class SeatNumber(val rowNum: Int, val seatNum: Int) {
+data class Seat(val rowNum: Int, val seatNum: Int) {
     fun getId() = rowNum * 8 + seatNum
+    fun inFirstRow() = (rowNum == 1)
+    fun inLastRow(numRows: Int) = (rowNum == numRows - 1)
 }
 
 typealias BinarySpec = String
@@ -18,10 +20,10 @@ class BinarySeatPartitioner(private val numRows: Int, private val numSeats: Int)
 
     private val numRowSteps = log2(numRows, RoundingMode.UNNECESSARY)
 
-    fun findSeat(spec: BinarySpec): SeatNumber {
+    fun findSeat(spec: BinarySpec): Seat {
         val rowSpec = extractRowSpec(spec)
         val seatSpec = extractSeatSpec(spec)
-        return SeatNumber(binSearch(rowSpec, numRows), binSearch(seatSpec, numSeats))
+        return Seat(binSearch(rowSpec, numRows), binSearch(seatSpec, numSeats))
     }
 
     private fun extractRowSpec(spec: BinarySpec) = String(spec.substring(0, numRowSteps).map { normalizeSpecChar(it) }.toCharArray())
