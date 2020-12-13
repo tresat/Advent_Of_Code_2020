@@ -38,4 +38,23 @@ class Checker(private val graph: ValueGraph<Bag, Int>) {
             resultPaths
         }
     }
+
+    fun countContentsOf(bag: Bag): Long {
+        val startNode = graph.nodes().find { it == bag }!!
+        return exhaustContentsOf(startNode)
+    }
+
+    private fun exhaustContentsOf(bag: Bag): Long {
+        val inNodes = graph.predecessors(bag)
+        return if (inNodes.isEmpty()) {
+            return 0
+        } else {
+            var childContentsCount: Long = 0
+            inNodes.forEach { inNode ->
+                val numContained = graph.edgeValue(inNode, bag)!!.get().toLong()
+                childContentsCount += numContained * (1 + countContentsOf(inNode))
+            }
+            childContentsCount
+        }
+    }
 }
