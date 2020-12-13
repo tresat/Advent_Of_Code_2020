@@ -1,6 +1,7 @@
 package com.tomtresansky.aoc_2020.day_08
 
 import com.tomtresansky.aoc_2020.day_08.computer.Computer
+import com.tomtresansky.aoc_2020.day_08.computer.Debugger
 import com.tomtresansky.aoc_2020.day_08.computer.Instruction
 import com.tomtresansky.aoc_2020.day_08.computer.Program
 import java.io.File
@@ -23,6 +24,10 @@ class Day08 {
     }
 
     fun solvePart2(): Int {
-        TODO()
+        val computer = Computer()
+        val debugger = Debugger()
+        val debuggedProgram = debugger.debug(program, computer)!!
+        computer.reset()
+        return computer.execute(debuggedProgram).finalValue()
     }
 }

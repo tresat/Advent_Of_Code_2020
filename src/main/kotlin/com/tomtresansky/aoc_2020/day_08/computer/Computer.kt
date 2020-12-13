@@ -4,7 +4,7 @@ enum class OpCode { nop, acc, jmp }
 
 data class Instruction(val lineNumber: Int, val code: OpCode, val operand: Int) {
     companion object {
-        private val INSTRUCTION_REGEX = """(acc|nop|jmp)\s(-|\+)(\d+)""".toRegex()
+        private val INSTRUCTION_REGEX = """(acc|nop|jmp)\s([-+])(\d+)""".toRegex()
         private const val OPCODE_INDEX = 1
         private const val OPERAND_SIGN_INDEX = 2
         private const val OPERAND_VALUE_INDEX = 3
@@ -31,7 +31,7 @@ class NormalExit(private val accumulator: Int): Result {
     override fun completed() = true
     override fun finalValue() = accumulator
 }
-class AbortedDueToInfiniteLoop(private val accumulator: Int, val duplicateInstruction: Instruction): Result {
+class AbortedDueToInfiniteLoop(private val accumulator: Int, @Suppress("unused") val duplicateInstruction: Instruction): Result {
     override fun completed() = false
     override fun finalValue() = accumulator
 }
@@ -65,5 +65,9 @@ class Computer {
             OpCode.jmp -> instruction.lineNumber + instruction.operand
             OpCode.nop -> instruction.lineNumber + 1
         }
+    }
+
+    fun reset() {
+        accumulator = 0
     }
 }
