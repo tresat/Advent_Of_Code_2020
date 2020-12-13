@@ -4,19 +4,21 @@ import com.tomtresansky.aoc_2020.util.Odometer
 import com.tomtresansky.aoc_2020.util.pow
 import java.util.*
 
-class Cipher(private val data: List<Long>, private val windowLength: Int = DEFAULT_LENGTH) {
+data class IndexedEntry(val element: Long, val index: Int)
+
+class Cipher(val data: List<Long>, private val windowLength: Int = DEFAULT_LENGTH) {
     companion object {
         private const val DEFAULT_LENGTH = 25
     }
 
     fun preamble() = data.subList(0, windowLength)
 
-    fun firstInvalidEntry(): Long? {
+    fun firstInvalidEntry(): IndexedEntry? {
         val lookup = ArrayDeque(preamble())
         for (currIdx in windowLength until data.size) {
             val entry = data[currIdx]
             if (!validateEntry(entry, lookup.toList())) {
-                return entry
+                return IndexedEntry(entry, currIdx)
             } else {
                 lookup.pop()
                 lookup.add(entry)

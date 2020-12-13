@@ -15,9 +15,22 @@ class Day09 {
         }
     }
 
-    fun solvePart1() = cipher.firstInvalidEntry()
+    fun solvePart1() = cipher.firstInvalidEntry()!!.element
 
-    fun solvePart2(): Int {
-        TODO()
+    fun solvePart2(): Long {
+        val invalidEntry = cipher.firstInvalidEntry()!!
+        val priorToInvalid = cipher.data.subList(0, invalidEntry.index)
+        val summingEntries = findContiguousSublistSummingTo(priorToInvalid, invalidEntry.element)!!
+        return summingEntries.minOrNull()!! + summingEntries.maxOrNull()!!
+    }
+
+    private fun findContiguousSublistSummingTo(priorToInvalid: List<Long>, element: Long): List<Long>? {
+        for (windowSize in 1 until priorToInvalid.size) {
+            val contiguousSublist = priorToInvalid.windowed(windowSize).find { it.sum() == element }
+            if (null != contiguousSublist) {
+                return contiguousSublist
+            }
+        }
+        return null
     }
 }
