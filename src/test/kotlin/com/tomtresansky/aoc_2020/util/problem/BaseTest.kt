@@ -1,6 +1,5 @@
 package com.tomtresansky.aoc_2020.util.problem
 
-import com.tomtresansky.aoc_2020.util.problem.IDay
 import org.junit.jupiter.api.Test
 
 abstract class BaseTest(private val problem: IDay<Any>) {
