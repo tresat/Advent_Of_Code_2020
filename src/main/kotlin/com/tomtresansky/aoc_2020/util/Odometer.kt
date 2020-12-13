@@ -1,9 +1,10 @@
-package com.tomtresansky.aoc_2020.day_01.util
+package com.tomtresansky.aoc_2020.util
 
 import java.lang.RuntimeException
 import java.util.*
+import kotlin.math.pow
 
-class Odometer(numCounters: Int, private val maxCounterValue: Int) {
+class Odometer(val numCounters: Int, private val maxCounterValue: Int) {
     private val counters: Array<Int> = Array(numCounters) { 0 }
     private var ticks = 0
 

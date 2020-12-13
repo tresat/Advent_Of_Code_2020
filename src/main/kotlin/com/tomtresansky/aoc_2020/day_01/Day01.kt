@@ -1,6 +1,6 @@
 package com.tomtresansky.aoc_2020.day_01
 
-import com.tomtresansky.aoc_2020.day_01.util.Odometer
+import com.tomtresansky.aoc_2020.util.Odometer
 import java.io.File
 
 private fun List<Int>.getAll(indices: Array<Int>): List<Int> = indices.map { i -> this[i] }
