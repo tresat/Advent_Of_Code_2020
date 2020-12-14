@@ -11,15 +11,18 @@ class Day10: IDay<Adapter> {
     }
 
     override fun getDayNumber() = 10
-    override fun loadSingleInputElement(rawData: String) = Adapter(rawData.toInt())
+    override fun loadSingleInputElement(rawData: String) = Adapter.get(rawData.toInt())
 
     override fun solvePart1(): Int {
-        val adapters = with(loadInput()) { this + Adapter(0) + Adapter(this.maxOf { it.rating } + BUILT_IN_ADAPTER_DIFFERENCE) }
-        val stack = Stacker(adapters).stack()
+        val adapters = with(loadInput()) { this + Adapter.get(0) + Adapter.get(this.maxOf { it.rating } + BUILT_IN_ADAPTER_DIFFERENCE) }
+        val stack = Stacker(adapters).inclusiveStack()
         val volt1differences = stack.findDifferences(1)
         val volt3differences = stack.findDifferences(3)
         return volt1differences.size * volt3differences.size
     }
 
-    override fun solvePart2() = 2
+    override fun solvePart2(): Int {
+        val adapters = with(loadInput()) { this + Adapter.get(0) + Adapter.get(this.maxOf { it.rating } + BUILT_IN_ADAPTER_DIFFERENCE) }
+        return Stacker(adapters).countExclusiveStacks()
+    }
 }
