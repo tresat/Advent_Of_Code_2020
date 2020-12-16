@@ -4,7 +4,7 @@ import java.io.File
 
 interface IDay<out T> {
     fun getDayNumber(): Int
-    fun getInputFileName() = "day_${getDayNumber()}_input.txt"
+    fun getInputFileName() = "day_${getDayNumber()}_input.txt" //"day_10_input_sample.txt"
     fun loadSingleInputElement(rawData: String): T
 
     fun loadInput(): List<T> {
@@ -12,6 +12,6 @@ interface IDay<out T> {
         return inputFile.readLines().map { loadSingleInputElement(it) }
     }
 
-    fun solvePart1(): Int
-    fun solvePart2(): Int
+    fun solvePart1(): Long
+    fun solvePart2(): Long
 }

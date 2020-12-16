@@ -11,14 +11,14 @@ class TerrainTest {
         val spec = "..#"
         val row = TerrainRow.fromSpec(spec)
 
+        assertThat(row.getTerrainTypeAt(0)).isEqualTo(TerrainType.OPEN)
         assertThat(row.getTerrainTypeAt(1)).isEqualTo(TerrainType.OPEN)
-        assertThat(row.getTerrainTypeAt(2)).isEqualTo(TerrainType.OPEN)
-        assertThat(row.getTerrainTypeAt(3)).isEqualTo(TerrainType.TREE)
+        assertThat(row.getTerrainTypeAt(2)).isEqualTo(TerrainType.TREE)
+        assertThat(row.getTerrainTypeAt(3)).isEqualTo(TerrainType.OPEN)
         assertThat(row.getTerrainTypeAt(4)).isEqualTo(TerrainType.OPEN)
-        assertThat(row.getTerrainTypeAt(5)).isEqualTo(TerrainType.OPEN)
-        assertThat(row.getTerrainTypeAt(6)).isEqualTo(TerrainType.TREE)
+        assertThat(row.getTerrainTypeAt(5)).isEqualTo(TerrainType.TREE)
+        assertThat(row.getTerrainTypeAt(6)).isEqualTo(TerrainType.OPEN)
         assertThat(row.getTerrainTypeAt(7)).isEqualTo(TerrainType.OPEN)
-        assertThat(row.getTerrainTypeAt(8)).isEqualTo(TerrainType.OPEN)
-        assertThat(row.getTerrainTypeAt(9)).isEqualTo(TerrainType.TREE)
+        assertThat(row.getTerrainTypeAt(8)).isEqualTo(TerrainType.TREE)
     }
 }

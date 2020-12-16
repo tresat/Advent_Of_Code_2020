@@ -18,7 +18,7 @@ class Stacker(private val adapters: List<Adapter>) {
         return graph.findAllPathsBetween(listOf(inclusiveStack[0]), inclusiveStack[inclusiveStack.lastIndex])
     }
 
-    fun countExclusiveStacks(): Int {
+    fun countExclusiveStacks(): Long {
         val inclusiveStack = inclusiveStack()
         val graph = connectivityGraph(inclusiveStack)
         return graph.countAllPathsBetween(listOf(inclusiveStack[0]), inclusiveStack[inclusiveStack.lastIndex])
@@ -47,23 +47,35 @@ class Stacker(private val adapters: List<Adapter>) {
 }
 
 // Uses lots of memory creating many, many lists
-private fun Graph<Adapter>.findAllPathsBetween(currentPath: Path, target: Adapter): List<Path> =
-    if (currentPath[currentPath.lastIndex] == target) {
-        // println("FOUND: ${currentPath.joinToString(" -> ")}")
-        listOf(currentPath)
-    } else {
-        // println("SEARCHING: ${currentPath[currentPath.lastIndex]}")
-        val nexts = this.successors(currentPath[currentPath.lastIndex])
-        nexts.map { next -> findAllPathsBetween(currentPath + next, target) }.flatten()
-    }
+fun Graph<Adapter>.findAllPathsBetween(currentPath: Path, target: Adapter) = this.findAllPathsBetween(currentPath, target, mutableMapOf())
+fun Graph<Adapter>.findAllPathsBetween(currentPath: Path, target: Adapter, cache: MutableMap<Adapter, List<Path>>): List<Path> {
+    val end = currentPath[currentPath.lastIndex]
+    if (!cache.containsKey(end)) {
+        if (end == target) {
+            println("FOUND: ${currentPath.joinToString(" -> ")}")
+            cache[end] = listOf(currentPath)
+        } else {
+            println("SEARCHING: ${currentPath[currentPath.lastIndex]}")
+            val nexts = this.successors(currentPath[currentPath.lastIndex])
+            cache[end] = nexts.flatMap { next -> findAllPathsBetween(currentPath + next, target, cache) }
+        }
+    } else { println("CACHE HIT: $end") }
+    return cache[end]!!
+}
 
-private fun Graph<Adapter>.countAllPathsBetween(currentPath: Path, target: Adapter): Int =
-    if (currentPath[currentPath.lastIndex] == target) {
-        println("FOUND: ${currentPath.joinToString(" -> ")}")
-        1
-    } else {
-        println("SEARCHING: ${currentPath[currentPath.lastIndex]}")
-        val nexts = this.successors(currentPath[currentPath.lastIndex])
-        nexts.map { next -> findAllPathsBetween(currentPath + next, target) }.size
-    }
-
+fun Graph<Adapter>.countAllPathsBetween(currentPath: Path, target: Adapter) = this.countAllPathsBetween(currentPath, target, mutableMapOf())
+fun Graph<Adapter>.countAllPathsBetween(currentPath: Path, target: Adapter, cache: MutableMap<Adapter, Long>): Long {
+    val end = currentPath[currentPath.lastIndex]
+    if (!cache.containsKey(end)) {
+        if (currentPath[currentPath.lastIndex] == target) {
+            println("FOUND: ${currentPath.joinToString(" -> ")}")
+            cache[end] = 1
+        } else {
+            println("SEARCHING: ${currentPath[currentPath.lastIndex]}")
+            val nexts = this.successors(currentPath[currentPath.lastIndex])
+            cache[end] = nexts.map { next -> countAllPathsBetween(currentPath + next, target, cache) }.sum()
+            println("STORED: $end = ${cache[end]}")
+        }
+    } else { println("CACHE HIT: $end = ${cache[end]}") }
+    return cache[end]!!
+}
