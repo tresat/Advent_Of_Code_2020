@@ -7,8 +7,9 @@ interface IDay<out T> {
     fun getInputFileName() = "day_${getDayNumber()}_input.txt" //"day_10_input_sample.txt"
     fun loadSingleInputElement(rawData: String): T
 
-    fun loadInput(): List<T> {
-        val inputFile = File(this::class.java.getResource(getInputFileName()).toURI())
+    fun loadInput() = loadInput(getInputFileName())
+    fun loadInput(inputFileName: String): List<T> {
+        val inputFile = File(this::class.java.getResource(inputFileName).toURI())
         return inputFile.readLines().map { loadSingleInputElement(it) }
     }
 
