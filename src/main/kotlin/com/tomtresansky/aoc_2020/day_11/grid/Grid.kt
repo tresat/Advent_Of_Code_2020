@@ -1,5 +1,49 @@
 package com.tomtresansky.aoc_2020.day_11.grid
 
+enum class VisibilityAlgorithm(val visibilityThreshold: Int) {
+    ADJACENT_SEATS(4){
+        override fun getNeighbors(pos: Coord, grid: Grid): List<Cell> {
+            val neighbors = mutableListOf<Cell>()
+            for (r in pos.first - 1..pos.first + 1) {
+                for (c in pos.second - 1..pos.second + 1) {
+                    if (r to c != pos) {
+                        grid.getCell(r to c)?.apply { neighbors.add(this) }
+                    }
+                }
+            }
+            return neighbors
+        }
+    },
+
+    VISIBLE_SEATS(5) {
+        override fun getNeighbors(pos: Coord, grid: Grid): List<Cell> {
+            val upNeighbor = nextCellWithSeat(pos, grid) { (it.first - 1 to it.second)}
+            val downNeighbor = nextCellWithSeat(pos, grid) { (it.first + 1 to it.second)}
+            val leftNeighbor = nextCellWithSeat(pos, grid) { (it.first to it.second - 1)}
+            val rightNeighbor = nextCellWithSeat(pos, grid) { (it.first to it.second + 1)}
+            val ulNeighbor = nextCellWithSeat(pos, grid) { (it.first - 1 to it.second - 1)}
+            val urNeighbor = nextCellWithSeat(pos, grid) { (it.first - 1 to it.second + 1)}
+            val dlNeighbor = nextCellWithSeat(pos, grid) { (it.first + 1 to it.second - 1)}
+            val drNeighbor = nextCellWithSeat(pos, grid) { (it.first + 1 to it.second + 1)}
+            return listOfNotNull(upNeighbor, downNeighbor, leftNeighbor, rightNeighbor, ulNeighbor, urNeighbor, dlNeighbor, drNeighbor)
+        }
+
+        private fun nextCellWithSeat(pos: Coord, grid: Grid, mover: (Coord) -> Coord): Cell? {
+            var cur = pos
+            do {
+                cur = mover.invoke(cur)
+                val cell = grid.getCell(cur)
+                if (cell?.hasSeat() == true) {
+                    return cell
+                }
+            } while (cell != null)
+            return null
+        }
+    };
+
+    abstract fun getNeighbors(pos: Coord, grid: Grid): List<Cell>
+}
+
 enum class Status(private val icon: Char) {
     NO_SEAT('.'),
     EMPTY_SEAT('L'),
@@ -12,23 +56,19 @@ enum class Status(private val icon: Char) {
     override fun toString() = icon.toString()
 }
 
-class Cell(var currStatus: Status, var newStatus: Status? = null) {
+class Cell(private var currStatus: Status, private var newStatus: Status? = null) {
     companion object {
-        private const val TOO_CROWDED_THRESHOLD = 4
         fun deserialize(data: Char) = Cell(Status.from(data))
     }
 
-    private val neighboors = mutableSetOf<Cell>()
-
-    fun addNeighboor(neighboor: Cell) = neighboors.add(neighboor)
-
     fun isOccupied() = (currStatus == Status.OCCUPIED_SEAT)
+    fun hasSeat() = (currStatus != Status.NO_SEAT)
 
-    fun calcNewStatus() {
+    fun calcNewStatus(neighbors: List<Cell>, visibilityThreshold: Int) {
         newStatus = when (currStatus) {
             Status.NO_SEAT -> Status.NO_SEAT
-            Status.EMPTY_SEAT -> if (neighboors.none { it.isOccupied() }) Status.OCCUPIED_SEAT else Status.EMPTY_SEAT
-            Status.OCCUPIED_SEAT -> if (neighboors.count { it.isOccupied() } >= TOO_CROWDED_THRESHOLD) Status.EMPTY_SEAT else Status.OCCUPIED_SEAT
+            Status.EMPTY_SEAT -> if (neighbors.none { it.isOccupied() }) Status.OCCUPIED_SEAT else Status.EMPTY_SEAT
+            Status.OCCUPIED_SEAT -> if (neighbors.count { it.isOccupied() } >= visibilityThreshold) Status.EMPTY_SEAT else Status.OCCUPIED_SEAT
         }
     }
 
@@ -43,45 +83,29 @@ class Cell(var currStatus: Status, var newStatus: Status? = null) {
 typealias Row = List<Cell>
 typealias Coord = Pair<Int, Int>
 
-class Grid(private val rows: List<Row>) {
-    init {
-        for (r in rows.indices) {
-            val row = rows[r]
-            for (c in row.indices) {
-                val current = (r to c)
-                linkIfPossible(current, (r - 1 to c - 1))
-                linkIfPossible(current, (r - 1 to c))
-                linkIfPossible(current, (r - 1 to c + 1))
-                linkIfPossible(current, (r to c - 1))
-                linkIfPossible(current, (r to c + 1))
-                linkIfPossible(current, (r + 1 to c - 1))
-                linkIfPossible(current, (r + 1 to c))
-                linkIfPossible(current, (r + 1 to c + 1))
-            }
-        }
-    }
+data class Snapshot(private val textRows: List<String>) {
+    override fun toString() = textRows.joinToString("\n")
+}
 
-    private fun linkIfPossible(from: Coord, to: Coord) {
-        if (from.first in rows.indices && to.first in rows.indices
-                && from.second in rows[from.first].indices && to.second in rows[to.first].indices) {
-            val fromCell = rows[from.first][from.second]
-            val toCell = rows[to.first][to.second]
-            fromCell.addNeighboor(toCell)
-        }
-    }
-
-    fun print() {
-        takeSnapshot().textRows.forEach { println(it) }
-    }
-
+class Grid(private val rows: List<Row>, private val algorithm: VisibilityAlgorithm) {
     private fun takeSnapshot() = Snapshot(rows.map { row -> row.joinToString("") { it.toString() } })
 
     fun step() {
-        eachCell { it.calcNewStatus() }
-        eachCell { it.applyNewStatus() }
-    }
+        rows.indices.forEach { r ->
+            rows[r].indices.forEach { c ->
+                val pos = r to c
+                val cell = getCell(pos)!!
+                val neighbors = algorithm.getNeighbors(r to c, this)
+                cell.calcNewStatus(neighbors, algorithm.visibilityThreshold)
+            }
+        }
 
-    private fun eachCell(action: (Cell) -> Unit ) = rows.flatten().forEach { action(it) }
+        rows.indices.forEach { r ->
+            rows[r].indices.forEach { c ->
+                getCell(r to c)?.applyNewStatus()
+            }
+        }
+    }
 
     fun stepUntilStable(): Int {
         var numSteps = 0
@@ -94,13 +118,15 @@ class Grid(private val rows: List<Row>) {
         return numSteps
     }
 
-    fun countOccupiedSeats(): Long {
-        var count: Long = 0
-        eachCell { if (it.isOccupied()) count++ }
-        return count
-    }
-}
+    fun countOccupiedSeats() = rows.flatten().count { it.isOccupied() }
 
-data class Snapshot(val textRows: List<String>) {
-    override fun toString() = textRows.joinToString { "\n" }
+    private fun isValidPosition(pos: Coord) = ((pos.first in rows.indices) && pos.second in rows[pos.first].indices)
+    fun getCell(pos: Coord) =
+        if (isValidPosition(pos)) {
+            rows[pos.first][pos.second]
+        } else {
+            null
+        }
+
+    override fun toString() = takeSnapshot().toString()
 }
