@@ -1,29 +1,33 @@
 package com.tomtresansky.aoc_2020.day_12
 
-import com.tomtresansky.aoc_2020.day_12.geometry.EAST
-import com.tomtresansky.aoc_2020.day_12.geometry.ORIGIN
-import com.tomtresansky.aoc_2020.day_12.geometry.Vector
-import com.tomtresansky.aoc_2020.day_12.geometry.calcManhattanDistanceTo
+import com.tomtresansky.aoc_2020.day_12.command.RelativeToWaypointCaptain
+import com.tomtresansky.aoc_2020.day_12.command.StandardCaptain
+import com.tomtresansky.aoc_2020.day_12.geometry.*
 import com.tomtresansky.aoc_2020.util.problem.BaseTest
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class Day12Test: BaseTest(Day12()) {
-    @Disabled
     @Test
-    fun testSample() {
+    @Disabled
+    fun testSampleStandard() {
         val problem = Day12()
         val commands = problem.loadInput("day_12_input_sample.txt")
-        var curr = Vector(ORIGIN, EAST)
+        val ship = Vector(ORIGIN, EAST)
+        val captain = StandardCaptain(ship)
+        captain.executeAll(commands, true)
+        return println("Distance: ${captain.ship.location.calcManhattanDistanceTo(ORIGIN).toLong()}")
+    }
 
-        println(curr)
-        commands.forEach { command ->
-            println(command)
-            curr = command.execute(curr)
-            println(curr)
-        }
-
-        val distance = curr.location.calcManhattanDistanceTo(ORIGIN).toLong()
-        println("Result: $distance")
+    @Test
+    @Disabled
+    fun testSampleRelative() {
+        val problem = Day12()
+        val commands = problem.loadInput("day_12_input_sample.txt")
+        val ship = Vector(ORIGIN, EAST)
+        val waypoint = Vector(ORIGIN.x() + 10 to ORIGIN.y() + 1, 0)
+        val captain = RelativeToWaypointCaptain(ship, waypoint)
+        captain.executeAll(commands, true)
+        return println("Distance: ${captain.ship.location.calcManhattanDistanceTo(ORIGIN).toLong()}")
     }
 }

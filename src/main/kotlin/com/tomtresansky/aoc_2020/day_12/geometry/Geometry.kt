@@ -3,7 +3,7 @@ package com.tomtresansky.aoc_2020.day_12.geometry
 import kotlin.math.abs
 
 val ORIGIN: Coord = (0.0 to 0.0)
-val EAST: Degree = 90
+const val EAST: Degree = 90
 
 typealias Distance = Int
 
@@ -26,8 +26,11 @@ typealias Coord = Pair<Double, Double>
 fun Coord.x() = this.first
 fun Coord.y() = this.second
 fun Coord.calcManhattanDistanceTo(other: Coord) = abs(x() - other.x()) + abs(y() - other.y())
+operator fun Coord.plus(other: Coord): Coord = ((x() + other.x()) to (y() + other.y()))
 
 data class Vector(val location: Coord, val heading: Degree) {
     fun x() = location.x()
     fun y() = location.y()
+
+    operator fun plus(other: Coord): Vector = Vector((x() + other.x()) to (y() + other.y()), heading)
 }
