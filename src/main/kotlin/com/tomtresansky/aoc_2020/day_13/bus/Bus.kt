@@ -17,12 +17,12 @@ data class Bus(val number: Long, val offset: Int) {
     }
 
     fun nextDeparturePast(earliestPossible: Timestamp): Long {
-        val seed = findSeed(earliestPossible)
+        val seed = lastDeparturePriorOrEqualTo(earliestPossible)
         val departureTimes = generateSequence(seed) { it + number }
         return departureTimes.find { it > earliestPossible }!!
     }
 
-    private fun findSeed(earliestPossible: Timestamp): Timestamp {
+    private fun lastDeparturePriorOrEqualTo(earliestPossible: Timestamp): Timestamp {
         var candidate = earliestPossible
         while (candidate.rem(number) != 0L) {
             candidate--
