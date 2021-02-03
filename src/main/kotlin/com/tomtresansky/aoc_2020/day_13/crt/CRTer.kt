@@ -45,4 +45,18 @@ class CRTer {
         }
         return Generator(candidate, generator.multiplicand * nextElem.id())
     }
+
+    fun buildGenerator(vararg elems: Element): Generator = buildGenerator(elems.toList())
+
+    fun buildGenerator(elems: List<Element>): Generator {
+        return if (elems.size == 1) {
+            Generator(elems[0].offset().toLong(), elems[0].id().toLong())
+        } else {
+            var generator = buildGenerator(elems[0], elems[1])
+            elems.toList().subList(2, elems.size).forEach {
+                generator = expandGenerator(generator, it)
+            }
+            generator
+        }
+    }
 }

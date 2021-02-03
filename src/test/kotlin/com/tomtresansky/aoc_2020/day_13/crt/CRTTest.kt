@@ -21,6 +21,16 @@ class CRTTest {
     }
 
     @Test
+    fun testVarargs() {
+        val e1 = (0 to 7)
+        val e2 = (1 to 13)
+        val e3 = (4 to 15)
+        val gen = solver.buildGenerator(e1, e2, e3)
+
+        assertThat(gen(0)).isEqualTo(896)
+    }
+
+    @Test
     fun testSample1() {
         val e1 = (0 to 17)
         val e2 = (2 to 13)
@@ -32,6 +42,14 @@ class CRTTest {
         val gen2 = solver.expandGenerator(gen1, e3)
 
         assertThat(gen2(0)).isEqualTo(3417)
+    }
+
+    @Test
+    fun testSample1Varargs() {
+        val elems: List<Element> = listOf((0 to 17), (2 to 13), (3 to 19))
+        val gen = solver.buildGenerator(elems)
+
+        assertThat(gen(0)).isEqualTo(3417)
     }
 
     @Test
@@ -51,5 +69,13 @@ class CRTTest {
         val gen3 = solver.expandGenerator(gen2, e4)
 
         assertThat(gen3(0)).isEqualTo(754018)
+    }
+
+    @Test
+    fun testSample4Varargs() {
+        val elems: List<Element> = listOf((0 to 1789), (1 to 37), (2 to 47), (3 to 1889))
+        val gen = solver.buildGenerator(elems)
+
+        assertThat(gen(0)).isEqualTo(1202161486)
     }
 }
