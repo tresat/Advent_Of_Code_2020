@@ -2,6 +2,7 @@ package com.tomtresansky.aoc_2020.day_13
 
 import com.tomtresansky.aoc_2020.day_13.bus.Bus
 import com.tomtresansky.aoc_2020.day_13.bus.Timestamp
+import com.tomtresansky.aoc_2020.day_13.crt.CRTer
 import java.io.File
 
 class Day13 {
@@ -24,20 +25,12 @@ class Day13 {
     }
 
     fun solvePart2(): Long {
-        var (_, buses) = readScheduleFromFile(INPUT_FILE_NAME)
+        val (_, buses) = readScheduleFromFile(INPUT_FILE_NAME)
 
         val busesWithOffests = buildOffsets(buses)
+        val elements = busesWithOffests.map { (it.second.toInt() to it.first.number.toInt()) }
 
-        var candidate: Timestamp = 100000000000000
-        while (!leavesInStep(candidate, busesWithOffests)) {
-            candidate = busesWithOffests[0].first.nextDeparturePast(candidate)
-        }
-
-        return candidate
-    }
-
-    private fun leavesInStep(candidate: Timestamp, busesWithOffests: List<Pair<Bus, Long>>): Boolean {
-        return busesWithOffests.all { (bus, offset) -> ((candidate + offset).rem(bus.number) == 0L) }
+        return CRTer().solve(elements)
     }
 
     private fun buildOffsets(buses: List<Bus?>): List<Pair<Bus, Long>> {

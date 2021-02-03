@@ -59,4 +59,18 @@ class CRTer {
             generator
         }
     }
+
+    fun solve(elems: List<Element>): Long {
+        val generator = if (elems.size == 1) {
+            Generator(elems[0].offset().toLong(), elems[0].id().toLong())
+        } else {
+            var generator = buildGenerator(elems[0], elems[1])
+            elems.toList().subList(2, elems.size).forEach {
+                generator = expandGenerator(generator, it)
+            }
+            generator
+        }
+
+        return generator(0L)
+    }
 }
