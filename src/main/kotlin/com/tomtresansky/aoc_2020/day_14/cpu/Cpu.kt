@@ -1,9 +1,10 @@
 package com.tomtresansky.aoc_2020.day_14.cpu
 
 import com.tomtresansky.aoc_2020.day_14.mask.Bitmask
+import java.math.BigInteger
 
-typealias Address = Long
-typealias Value = Long
+typealias Address = BigInteger
+typealias Value = BigInteger
 
 class Cpu {
     companion object {
@@ -25,5 +26,5 @@ class Cpu {
         command.execute(this)
     }
 
-    fun sumMemory() = memory.values.sum()
+    fun sumMemory() = memory.values.fold(BigInteger.ZERO) { acc, curr -> acc + curr }
 }

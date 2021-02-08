@@ -33,7 +33,7 @@ class Day14: IDay<ICommand> {
         val commands = loadInput()
         val cpu = Cpu()
         commands.forEach { cpu.execute(it) }
-        return cpu.sumMemory() // 2202748520763 is too low?
+        return cpu.sumMemory().toLong() // 2202748520763 is too low?
     }
 
     override fun solvePart2(): Long {

@@ -1,6 +1,7 @@
 package com.tomtresansky.aoc_2020.day_14.cpu
 
 import com.tomtresansky.aoc_2020.day_14.mask.Bitmask
+import java.math.BigInteger
 
 interface ICommand {
     fun execute(cpu: Cpu)
@@ -16,8 +17,8 @@ class SetMemoryCommand(private val address: Address, private val value: Value): 
         fun deserialize(rawData: String): SetMemoryCommand {
             val matchResult = COMMAND_REGEX.matchEntire(rawData)
             with (matchResult?.groupValues!!) {
-                val address = get(ADDRESS_INDEX).toLong()
-                val value = get(VALUE_INDEX).toLong()
+                val address = BigInteger.valueOf(get(ADDRESS_INDEX).toLong())
+                val value = BigInteger.valueOf(get(VALUE_INDEX).toLong())
                 return SetMemoryCommand(address, value)
             }
         }
