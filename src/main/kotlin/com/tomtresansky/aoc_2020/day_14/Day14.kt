@@ -1,9 +1,6 @@
 package com.tomtresansky.aoc_2020.day_14
 
-import com.tomtresansky.aoc_2020.day_14.cpu.Cpu
-import com.tomtresansky.aoc_2020.day_14.cpu.ICommand
-import com.tomtresansky.aoc_2020.day_14.cpu.SetBitmaskCommand
-import com.tomtresansky.aoc_2020.day_14.cpu.SetMemoryCommand
+import com.tomtresansky.aoc_2020.day_14.cpu.*
 import com.tomtresansky.aoc_2020.day_14.mask.Bitmask
 import com.tomtresansky.aoc_2020.util.problem.IDay
 import java.lang.IllegalStateException
@@ -30,13 +27,18 @@ class Day14: IDay<ICommand> {
         }
 
     override fun solvePart1(): Long {
-        val commands = loadInput()
-        val cpu = Cpu()
-        commands.forEach { cpu.execute(it) }
-        return cpu.sumMemory().toLong() // 2202748520763 is too low?
+        val cpu = BasicCpu()
+        loadInput().forEach { cpu.execute(it) }
+        val result = cpu.sumMemory().toLong()
+        assert(result == 9628746976360L)
+        return result
     }
 
     override fun solvePart2(): Long {
-        TODO()
+        val cpu = MemAddressDecoderCpu()
+        loadInput().forEach { cpu.execute(it) }
+        val result = cpu.sumMemory().toLong()
+        assert(result == 4574598714592L)
+        return result
     }
 }

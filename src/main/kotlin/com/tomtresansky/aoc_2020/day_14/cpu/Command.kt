@@ -4,7 +4,7 @@ import com.tomtresansky.aoc_2020.day_14.mask.Bitmask
 import java.math.BigInteger
 
 interface ICommand {
-    fun execute(cpu: Cpu)
+    fun execute(cpu: AbstractCpu)
 }
 
 class SetMemoryCommand(private val address: Address, private val value: Value): ICommand {
@@ -24,7 +24,7 @@ class SetMemoryCommand(private val address: Address, private val value: Value): 
         }
     }
 
-    override fun execute(cpu: Cpu) {
+    override fun execute(cpu: AbstractCpu) {
         cpu.setMemory(address, value)
     }
 }
@@ -34,7 +34,7 @@ class SetBitmaskCommand(private val mask: Bitmask): ICommand {
         fun deserialize(rawData: String) = SetBitmaskCommand(Bitmask(rawData))
     }
 
-    override fun execute(cpu: Cpu) {
+    override fun execute(cpu: AbstractCpu) {
         cpu.setMask(mask)
     }
 }

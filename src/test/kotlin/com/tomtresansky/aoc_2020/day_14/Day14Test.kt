@@ -1,6 +1,6 @@
 package com.tomtresansky.aoc_2020.day_14
 
-import com.tomtresansky.aoc_2020.day_14.cpu.Cpu
+import com.tomtresansky.aoc_2020.day_14.cpu.BasicCpu
 import com.tomtresansky.aoc_2020.day_14.cpu.Value
 import com.tomtresansky.aoc_2020.day_14.mask.Bitmask
 import com.tomtresansky.aoc_2020.day_14.mask.convertToBinary
@@ -15,7 +15,7 @@ class Day14Test: BaseTest(Day14()) {
     fun testSample() {
         val problem = Day14()
         val commands = problem.loadInput("day_14_sample.txt")
-        val cpu = Cpu()
+        val cpu = BasicCpu()
         commands.forEach { cpu.execute(it) }
         assertThat(cpu.sumMemory()).isEqualTo(165)
     }
@@ -52,5 +52,27 @@ class Day14Test: BaseTest(Day14()) {
         val binary = input.convertToBinary()
         val result = binary.convertToNumber()
         assertThat(result).isEqualTo(input)
+    }
+
+    @Test
+    fun testApplyDecodingTo() {
+        val mask = Bitmask("000000000000000000000000000000X1001X")
+        val input: Value = BigInteger.valueOf(42)
+        val binaryInput = input.convertToBinary()
+        val result = mask.applyDecodingTo(input)
+        //println ("value:   $binaryInput")
+        //println ("mask:    $mask")
+        //println ("result:  $result")
+        assertThat(result).isEqualTo(Bitmask("000000000000000000000000000000X1101X"))
+    }
+
+    @Test
+    fun testFloat() {
+        val mask = Bitmask("000000000000000000000000000000X1101X")
+        val float = mask.float()
+        assertThat(float).containsExactlyInAnyOrder(BigInteger.valueOf(26),
+                                                    BigInteger.valueOf(27),
+                                                    BigInteger.valueOf(58),
+                                                    BigInteger.valueOf(59))
     }
 }

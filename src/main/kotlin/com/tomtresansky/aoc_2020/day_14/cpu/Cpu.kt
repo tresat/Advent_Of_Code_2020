@@ -6,25 +6,38 @@ import java.math.BigInteger
 typealias Address = BigInteger
 typealias Value = BigInteger
 
-class Cpu {
+abstract class AbstractCpu {
     companion object {
         const val BITS = 36
     }
 
-    private var mask: Bitmask? = null
-    private val memory: MutableMap<Address, Value> = mutableMapOf()
+    protected var _mask: Bitmask? = null
+    protected val _memory: MutableMap<Address, Value> = mutableMapOf()
 
     fun setMask(mask: Bitmask) {
-        this.mask = mask
+        this._mask = mask
     }
 
-    fun setMemory(address: Address, value: Value) {
-        memory[address] = mask!!.applyTo(value)
-    }
+    abstract fun setMemory(address: Address, value: Value)
 
     fun execute(command: ICommand) {
         command.execute(this)
     }
 
-    fun sumMemory() = memory.values.fold(BigInteger.ZERO) { acc, curr -> acc + curr }
+    fun sumMemory() = _memory.values.fold(BigInteger.ZERO) { acc, curr -> acc + curr }
+}
+
+class BasicCpu: AbstractCpu() {
+    override fun setMemory(address: Address, value: Value) {
+        _memory[address] = _mask!!.applyTo(value)
+    }
+}
+
+class MemAddressDecoderCpu: AbstractCpu() {
+    override fun setMemory(address: Address, value: Value) {
+        val addressPattern = _mask!!.applyDecodingTo(address)
+
+        val allAddresses = addressPattern.float()
+        allAddresses.forEach { _memory[it] = value }
+    }
 }
