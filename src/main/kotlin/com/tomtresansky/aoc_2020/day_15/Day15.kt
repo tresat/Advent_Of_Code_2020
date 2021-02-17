@@ -15,6 +15,7 @@ class Day15: IDay<List<Spoken>> {
     }
 
     override fun solvePart2(): Long {
-        TODO("Not yet implemented")
+        val game = Game(loadInput()[0])
+        return game.getSpokenValueOnTurn(30000000).toLong()
     }
 }
