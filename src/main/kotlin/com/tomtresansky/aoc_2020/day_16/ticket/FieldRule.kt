@@ -1,6 +1,6 @@
 package com.tomtresansky.aoc_2020.day_16.ticket
 
-class FieldRule(private val name: String, private val ranges: List<ValidRange>) {
+data class FieldRule(val name: String, private val ranges: List<ValidRange>) {
     companion object {
         private val REGEX = """([a-zA-Z\s]+):\s(\d+)\-(\d+)\sor\s(\d+)\-(\d+)""".toRegex()
         private const val NAME_IDX = 1

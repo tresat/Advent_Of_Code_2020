@@ -36,8 +36,61 @@ class Day16 {
     fun solvePart1(): Int {
         val lines = readLinesFromFile(INPUT_FILE_NAME)
         val rulebook = loadRulebook(lines)
-        //val yourTicket = loadYourTicket(lines)
         val nearbyTickets = loadNearbyTickets(lines)
         return nearbyTickets.flatMap { rulebook.invalidValues(it) }.sum()
+    }
+
+    fun solvePart2(): Long {
+        val lines = readLinesFromFile(INPUT_FILE_NAME)
+        val rulebook = loadRulebook(lines)
+        val yourTicket = loadYourTicket(lines)
+        val nearbyTickets = loadNearbyTickets(lines)
+        val validTickets = nearbyTickets.filter { rulebook.isValid(it) }
+
+        val potentialRuleMatches = determinePotentialMatches(validTickets, rulebook)
+        val ruleIndices = determineRuleIndices(potentialRuleMatches)
+
+        val departureRules = rulebook.rules.filter { it.name.startsWith("departure") }
+        val departureIndices = departureRules.map { ruleIndices[it]!! }
+        val myValues = departureIndices.map { yourTicket.values[it] }
+
+        return myValues.fold(1L) { acc, i -> acc * i.toLong() }
+    }
+
+    private fun determineRuleIndices(potentialRuleMatches: Map<Int, Set<FieldRule>>): Map<FieldRule, Int> {
+        val result = mutableMapOf<FieldRule, Int>()
+
+        val curRuleMatches: MutableMap<Int, MutableSet<FieldRule>> = mutableMapOf()
+        potentialRuleMatches.forEach { curRuleMatches[it.key] = it.value.toMutableSet() }
+
+        while (curRuleMatches.isNotEmpty()) {
+            val loneRuleEntry = curRuleMatches.entries.first { e ->  e.value.size == 1 }
+            val rule = loneRuleEntry.value.single()
+            val index = loneRuleEntry.key
+            result[rule] = index
+            curRuleMatches.remove(index)
+            curRuleMatches.values.forEach { it.remove(rule) }
+        }
+
+        return result
+    }
+
+    private fun determinePotentialMatches(
+        validTickets: List<Ticket>,
+        rulebook: Rulebook
+    ): Map<Int, Set<FieldRule>> {
+        val allPotentialMatches = mutableMapOf<Int, MutableSet<FieldRule>>()
+        validTickets.forEach { t ->
+            val matchesForNewTicket = rulebook.potentiallyMatchingRules(t)
+            matchesForNewTicket.forEach { newPotentialMatch ->
+                val idx = newPotentialMatch.key
+                val matchingRules = newPotentialMatch.value
+                allPotentialMatches.merge(idx, matchingRules.toMutableSet()) { s1, s2 ->
+                    s1.intersect(s2).toMutableSet()
+                }
+            }
+        }
+
+        return allPotentialMatches
     }
 }
