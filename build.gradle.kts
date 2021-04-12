@@ -38,4 +38,5 @@ application {
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-Xinline-classes")
+    //useIR = true TODO: Class 'com.tomtresansky.aoc_2020.day_01.Day01' is compiled by a new Kotlin compiler backend and cannot be loaded by the old compiler
 }
