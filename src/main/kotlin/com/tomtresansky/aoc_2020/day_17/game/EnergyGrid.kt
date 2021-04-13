@@ -31,15 +31,21 @@ class ConwayCube(private val coord: Coord, initState: State) {
     }
 
     fun calcNewStatus() {
-        val activeNeighbors = neighbors.count { it.state == State.ACTIVE }
+        val activeNeighbors = neighbors.filter { it.state == State.ACTIVE }
         newState = if (state == State.ACTIVE) {
-            if (activeNeighbors == 2 || activeNeighbors == 3) {
+            if (activeNeighbors.size == 2 || activeNeighbors.size == 3) {
                 State.ACTIVE
             } else {
+                //println("Cell Inactivating [x: ${coord.x}, y: ${coord.y}, z: ${coord.z}]")
+                //activeNeighbors.forEach { println(" - Active neighbor: [x: ${it.coord.x}, y: ${it.coord.y}, z: ${it.coord.z}]") }
+                //println()
                 State.INACTIVE
             }
         } else {
-            if (activeNeighbors == 3) {
+            if (activeNeighbors.size == 3) {
+                //println("Cell Activating [x: ${coord.x}, y: ${coord.y}, z: ${coord.z}]")
+                //activeNeighbors.forEach { println("- Active neighbor: [x: ${it.coord.x}, y: ${it.coord.y}, z: ${it.coord.z}]") }
+                //println()
                 State.ACTIVE
             } else {
                 State.INACTIVE
@@ -73,29 +79,20 @@ class Slice(text: List<String>) {
     fun size() = cells.size
 }
 
-class EnergyGrid(initState: Slice) {
-    companion object {
-        private const val DEFAULT_NUM_CYCLES_TO_RUN = 3
-    }
-
+class EnergyGrid(initState: Slice, cyclesToRun: Int) {
     private val cells: MutableMap<Coord, ConwayCube?>
-    private val minX: Int; private val maxX: Int
-    private val minY: Int; private val maxY: Int
-    private val minZ: Int; private val maxZ: Int
+    private val extreme: Int
 
     init {
-        val totalWidth = initState.size() + DEFAULT_NUM_CYCLES_TO_RUN + 1
+        val initSize = initState.size()
+        val totalWidth = initSize + (cyclesToRun * 2)
         val totalNumCubes = (totalWidth).pow(3)
         cells = HashMap(totalNumCubes)
+        extreme = (totalWidth / 2) + 1
 
-        val halfMax = totalWidth / 2
-        minX = -halfMax; maxX = halfMax
-        minY = -halfMax; maxY = halfMax
-        minZ = -halfMax; maxZ = halfMax
-
-        val halfInit = initState.size() / 2
-        for (y in 0 until initState.size()) {
-            for (x in 0 until initState.size()) {
+        val halfInit = initSize / 2
+        for (y in 0 until initSize) {
+            for (x in 0 until initSize) {
                 val coord = Coord(x - halfInit, y - halfInit, 0)
                 cells[coord] = ConwayCube(coord, initState.get(x, y))
             }
@@ -110,9 +107,9 @@ class EnergyGrid(initState: Slice) {
     }
 
     private fun everywhere(action: (x: Int, y: Int, z: Int) -> Any) {
-        for (z in minZ..maxZ) {
-            for (y in minY..maxY) {
-                for (x in minX..maxX) {
+        for (z in -extreme..extreme) {
+            for (y in -extreme..extreme) {
+                for (x in -extreme..extreme) {
                     action(x, y, z)
                 }
             }
@@ -129,17 +126,17 @@ class EnergyGrid(initState: Slice) {
             for (ny in y-1..y+1) {
                 for (nx in x-1..x+1) {
                     if (nx == x && ny == y && nz == z) {
-                        println("Ignoring [x: $nx, y: $ny, z: $nz] - same cell")
-                    } else if (nx !in minX..maxX) {
-                        println("Ignoring [x: $nx, y: $ny, z: $nz] - x out of bounds")
-                    } else if (ny !in minY..maxY) {
-                        println("Ignoring [x: $nx, y: $ny, z: $nz] - y out of bounds")
-                    } else if (nz !in minZ..maxZ) {
-                        println("Ignoring [x: $nx, y: $ny, z: $nz] - z out of bounds")
+                        //println("Ignoring [x: $nx, y: $ny, z: $nz] - same cell")
+                    } else if (nx !in -extreme..extreme) {
+                        //println("Ignoring [x: $nx, y: $ny, z: $nz] - x out of bounds")
+                    } else if (ny !in -extreme..extreme) {
+                        //println("Ignoring [x: $nx, y: $ny, z: $nz] - y out of bounds")
+                    } else if (nz !in -extreme..extreme) {
+                        //println("Ignoring [x: $nx, y: $ny, z: $nz] - z out of bounds")
                     } else {
                         val neighbor = cells[Coord(nx, ny, nz)]!!
                         cell.addNeighbor(neighbor)
-                        println("Linked [x: $x, y: $y, z: $z] to [x: $nx, y: $ny, z: $nz]")
+                        //println("Linked [x: $x, y: $y, z: $z] to [x: $nx, y: $ny, z: $nz]")
                     }
                 }
             }
@@ -162,22 +159,35 @@ class EnergyGrid(initState: Slice) {
     }
 
     private fun calcNewStatus() {
+        //printActives("Current actives: ")
         everywhere { x, y, z -> cells[Coord(x, y, z)]!!.calcNewStatus() }
     }
 
     private fun applyNewStatus() {
         everywhere { x, y, z -> cells[Coord(x, y, z)]!!.applyNewStatus() }
+        //printActives("New actives: ")
+    }
+
+    private fun printActives(msg: String) {
+        println(msg)
+        everywhere { x, y, z ->
+            val cell = cells[Coord(x, y, z)]!!
+            if (cell.state == State.ACTIVE) {
+                println("[x: $x, y: $y, z: $z]")
+            }
+        }
+        println()
     }
 
     override fun toString(): String {
         val sbOverall = StringBuilder()
-        for (z in minZ..maxZ) {
+        for (z in -extreme..extreme) {
             val sbFrame = StringBuilder()
             sbFrame.append("Z index: $z:\n")
             var hadActiveCell = false
 
-            for (y in minY..maxY) {
-                for (x in minX..maxX) {
+            for (y in -extreme..extreme) {
+                for (x in -extreme..extreme) {
                     val cell = cells[Coord(x, y, z)]!!
                     sbFrame.append(cell)
                     if (cell.state == State.ACTIVE) {
@@ -192,6 +202,8 @@ class EnergyGrid(initState: Slice) {
                 sbOverall.append(sbFrame)
             }
         }
+
+        sbOverall.append("\nActive Cells: ${numActiveCubes()}\n\n")
         return sbOverall.toString()
     }
 

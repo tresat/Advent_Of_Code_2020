@@ -8,6 +8,6 @@ class Day17Test {
         val problem = Day17()
         val solution = problem.solvePart1()
         println ("Day 17, Part 1: $solution")
-        assert(solution == 112L)
+        assert(solution == 313L)
     }
 }
