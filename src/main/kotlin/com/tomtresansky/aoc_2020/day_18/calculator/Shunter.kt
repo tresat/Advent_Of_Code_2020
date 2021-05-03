@@ -5,7 +5,7 @@ import java.util.*
 
 internal class Shunter {
     companion object {
-        private const val INIT_OUTPUT_QUEUE_SIZE = 25
+        private const val INIT_OUTPUT_QUEUE_SIZE = 100
     }
 
     private val outputQueue = ArrayQueue<Token>(INIT_OUTPUT_QUEUE_SIZE)
@@ -13,8 +13,8 @@ internal class Shunter {
 
     fun shunt(input: String): PostfixCalculation {
         reset()
-        process(input)
-        return drainStack()
+        tokenizeToStacks(input)
+        return drainStacks()
     }
 
     private fun reset() {
@@ -22,7 +22,7 @@ internal class Shunter {
         operatorStack.empty()
     }
 
-    private fun process(input: String) {
+    private fun tokenizeToStacks(input: String) {
         val tokenizer = Tokenizer(input)
         while (tokenizer.hasNextToken()) {
             val token = tokenizer.nextToken()
@@ -30,7 +30,7 @@ internal class Shunter {
         }
     }
 
-    private fun drainStack(): PostfixCalculation {
+    private fun drainStacks(): PostfixCalculation {
         while (operatorStack.isNotEmpty()) {
             outputQueue.add(operatorStack.pop())
         }

@@ -14,6 +14,12 @@ class Day18 : IDay<PostfixCalculation> {
     override fun getDayNumber() = 18
     override fun loadSingleInputElement(rawData: String) = shunter.shunt(rawData)
 
-    override fun solvePart1() = loadInput().sumOf { it.evaluate() }.toLong()
-    override fun solvePart2() = loadInput().sumOf { it.evaluate() }.toLong()
+    override fun solvePart1(): Long {
+        val result = loadInput().sumOf { it.evaluate() }
+        assert(result == 31142189909908)
+        return result
+    }
+    override fun solvePart2(): Long {
+        TODO()
+    }
 }

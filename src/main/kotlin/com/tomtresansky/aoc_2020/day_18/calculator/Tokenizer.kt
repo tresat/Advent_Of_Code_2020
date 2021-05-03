@@ -14,12 +14,14 @@ sealed class Token(private val valString: String): Comparable<Token> {
     override fun compareTo(other: Token) = EQUAL
     override fun toString() = valString
 
-    data class Number(val value: Int): Token(value.toString()) {
-        constructor(valString: String): this(valString.toInt())
+    data class Number(val value: Long): Token(value.toString()) {
+        constructor(valString: String): this(valString.toLong())
 
         override fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>) {
             outputQueue.add(this)
         }
+
+        override fun toString() = value.toString()
     }
 
     abstract class Operator(symbol: String) : Token(symbol) {
@@ -29,10 +31,16 @@ sealed class Token(private val valString: String): Comparable<Token> {
             }
             operatorStack.push(this)
         }
+
+        abstract fun operate(lhs: Number, rhs: Number): Long
     }
 
-    object Addition: Operator("+")
-    object Multiplication: Operator("*")
+    object Addition: Operator("+") {
+        override fun operate(lhs: Number, rhs: Number) = (lhs.value + rhs.value)
+    }
+    object Multiplication: Operator("*") {
+        override fun operate(lhs: Number, rhs: Number) = (lhs.value * rhs.value)
+    }
 
     object OpenParen: Token("(") {
         override fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>) {
@@ -45,7 +53,7 @@ sealed class Token(private val valString: String): Comparable<Token> {
             while (operatorStack.isNotEmpty() && operatorStack.peek() !is OpenParen) {
                 outputQueue.add(operatorStack.pop())
             }
-            if (operatorStack.isNotEmpty() && operatorStack.peek() !is OpenParen) {
+            if (operatorStack.isNotEmpty() && operatorStack.peek() is OpenParen) {
                 operatorStack.pop()
             }
         }
@@ -81,7 +89,7 @@ internal class Tokenizer(private var input: String) {
         var numStr = ""
         do {
             numStr += popNextChar()
-        } while (peekNextChar().isDigit())
+        } while (input.isNotEmpty() && peekNextChar().isDigit())
         return Token.Number(numStr)
     }
 
