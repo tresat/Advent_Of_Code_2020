@@ -3,7 +3,7 @@ package com.tomtresansky.aoc_2020.day_18.calculator
 import com.sun.jmx.remote.internal.ArrayQueue
 import java.util.*
 
-internal class Shunter {
+internal class Shunter(private val precedence: OperatorPrecedence) {
     companion object {
         private const val INIT_OUTPUT_QUEUE_SIZE = 100
     }
@@ -26,7 +26,7 @@ internal class Shunter {
         val tokenizer = Tokenizer(input)
         while (tokenizer.hasNextToken()) {
             val token = tokenizer.nextToken()
-            token.shunt(outputQueue, operatorStack)
+            token.shunt(outputQueue, operatorStack, precedence)
         }
     }
 

@@ -1,23 +1,19 @@
 package com.tomtresansky.aoc_2020.day_18.calculator
 
 import com.sun.jmx.remote.internal.ArrayQueue
+import com.tomtresansky.aoc_2020.day_18.calculator.OperatorPrecedence.Companion.LESSER
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.util.*
 
-private const val LESSER = -1
-private const val EQUAL = 0
-private const val GREATER = 1
-
-sealed class Token(private val valString: String): Comparable<Token> {
-    abstract fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>)
-    override fun compareTo(other: Token) = EQUAL
+sealed class Token(private val valString: String) {
+    abstract fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>, precedence: OperatorPrecedence)
     override fun toString() = valString
 
     data class Number(val value: Long): Token(value.toString()) {
         constructor(valString: String): this(valString.toLong())
 
-        override fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>) {
+        override fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>, precedence: OperatorPrecedence) {
             outputQueue.add(this)
         }
 
@@ -25,8 +21,8 @@ sealed class Token(private val valString: String): Comparable<Token> {
     }
 
     abstract class Operator(symbol: String) : Token(symbol) {
-        override fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>) {
-            while (operatorStack.isNotEmpty() && operatorStack.peek() !is OpenParen && operatorStack.peek().compareTo(this) != LESSER) {
+        override fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>, precedence: OperatorPrecedence) {
+            while (operatorStack.isNotEmpty() && operatorStack.peek() !is OpenParen && precedence.compare(operatorStack.peek(), this) != OperatorPrecedence.LESSER) {
                 outputQueue.add(operatorStack.pop())
             }
             operatorStack.push(this)
@@ -43,13 +39,13 @@ sealed class Token(private val valString: String): Comparable<Token> {
     }
 
     object OpenParen: Token("(") {
-        override fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>) {
+        override fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>, precedence: OperatorPrecedence) {
             operatorStack.push(this)
         }
     }
 
     object CloseParen: Token(")") {
-        override fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>) {
+        override fun shunt(outputQueue: ArrayQueue<Token>, operatorStack: Stack<Token>, precedence: OperatorPrecedence) {
             while (operatorStack.isNotEmpty() && operatorStack.peek() !is OpenParen) {
                 outputQueue.add(operatorStack.pop())
             }

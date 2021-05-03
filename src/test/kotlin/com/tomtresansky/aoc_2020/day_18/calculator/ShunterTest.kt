@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class ShunterTest {
-    private val shunter = Shunter()
+    private val shunter = Shunter(SamePrecedence)
 
     @Test
     fun simpleTest() {
